@@ -22,7 +22,7 @@ void dehexify() {
             int top_half = nibble_to_int(c.buffer[i+2]);
             int bottom_half = nibble_to_int(c.buffer[i+3]);
             c.answer[j] = top_half << 4 | bottom_half;
-            i += 3;
+            i += 3;// 可以造成缓冲区溢出，因为i会增加3，但j只增加1，可能会覆盖c.answer中的数据
         } else {
             c.answer[j] = c.buffer[i];
         }
