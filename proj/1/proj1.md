@@ -226,6 +226,23 @@ handle的rip位置是0xbfe61a3c，从这个位置之后找已知地址,在0xbfe6
 
 前面的思路探索了好久，注定是错的，因为buf缓冲区就这么大，而ret2ret和ret2pop都要求shellcode写进buf，所以是不行的
 
+解释一下ret2pop，其实就是在ret2ret的基础上，为了防止最后\x00字节的影响，在ret(可能已经ret了很多次)之后紧跟的就是pop xxx ret。至于弹出到谁无关紧要。
+
+这样，越过了被写入的\x00字节，我们让eip变成了我们指定的“完美指针”(perfect pointer)，这个指针要有两个特性。一是本身位于argv数组中（也就是作为程序的参数输入，这样指针是稳定的，不会改变），二是被压入到堆栈
+
+例子
+
+```cpp
+int function(int x,char *str){
+	char buf[256];
+	strcpy(buf,str);
+	return x;
+}
+int main(int argc,char *argv[]){
+	function(64,argv[1]);
+}
+```
+
 要用另一种攻击方式ret2esp
 
 0x0000e4ff 可以被解释为jmp *esp
@@ -246,11 +263,11 @@ ret         <----eip
 
 如果我们能找到0xe4ff，并把存入0xe4ff的地址放入rip中。
 
-而执行完ret之后，eip会指向0xe4ff，这样执行 jmp *esp，eip会指向waibibabu，这样就可以执行后面的payload了
+而执行完ret之后，eip会指向0xe4ff，这样执行 jmp \*esp，eip会指向waibibabu，这样就可以执行后面的payload了
 
 但是0xe4ff并没有这么容易找，推荐用hexdump，一键搜索。
 
-最后的结语
+## 最后的结语
 
 I know you're out there. I can feel you now. I know that you're afraid. . .
 you're afraid of us. You're afraid of change. I don't know the future. I didn't
