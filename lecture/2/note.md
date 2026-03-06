@@ -130,15 +130,14 @@ RIP return instruction pointer: return address on the stack
 从头到尾调用一个函数要干三件事
 
 0. 调用方将参数压入自己的栈中(也就是说函数参数一直保存于栈中)
-1. 调用方将rip(也就是call foo之后的一条指令的地址)压入栈中
-2. call foo，eip移动到foo所在的位置(接下来的操作都是foo函数的一部分)
-3. esp下移，用来存下当前的ebp
-4. 存下当前的ebp(sfp)
-5. 把ebp挪到当前esp的位置，构成新的栈帧的栈底(movl %ebp,%esp)
-6. 执行完源代码中函数的所有操作，有返回值的情况下存入eax
-7. 清理栈帧(靠esp的移动)
-8. esp挪到栈底(与ebp一同指向sfp)
-9. leave操作(把esp当前指向的sfp给ebp，并上移，也就是 popl %ebp)
-10. ret操作(popl %eip)(foo函数内容结束)
-11. eip此时指向的指令：有参数时esp上移，清理函数的参数，没有就执行后面的操作，调用流程结束。
+1. call foo要做两件事，第一件是将rip(也就是call foo之后的一条指令的地址)压入栈中，第二件就是eip移动到foo所在的位置(接下来的操作都是foo函数的一部分)
+2. esp下移，用来存下当前的ebp
+3. 存下当前的ebp(sfp)
+4. 把ebp挪到当前esp的位置，构成新的栈帧的栈底(movl %ebp,%esp)
+5. 执行完源代码中函数的所有操作，有返回值的情况下存入eax
+6. 清理栈帧(靠esp的移动)
+7. esp挪到栈底(与ebp一同指向sfp)
+8. leave操作(把esp当前指向的sfp给ebp，并上移，也就是 popl %ebp)
+9. ret操作(popl %eip)(foo函数内容结束)
+10. eip此时指向的指令：有参数时esp上移，清理函数的参数，没有就执行后面的操作，调用流程结束。
 
